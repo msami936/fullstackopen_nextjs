@@ -1,8 +1,11 @@
-export default function Home() {
+import Homepage from "./homepage.mdx";
+
+const Home = () => {
   return (
-    <div>
-      <h2>Blog app home</h2>
-      <p>Welcome to the blog application.</p>
+    <div className="markdown">
+      <Homepage />
     </div>
   );
-}
+};
+
+export default Home;

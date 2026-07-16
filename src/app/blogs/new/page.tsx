@@ -1,30 +1,12 @@
-import { createBlogAction } from "../actions";
+import NewBlogForm from "./NewBlogForm";
 
 export default function NewBlogPage() {
   return (
-    <div>
-      <h2>Create a new blog</h2>
-      <form action={createBlogAction}>
-        <div style={{ marginBottom: 8 }}>
-          <label>
-            title
-            <input name="title" required style={{ marginLeft: 8 }} />
-          </label>
-        </div>
-        <div style={{ marginBottom: 8 }}>
-          <label>
-            author
-            <input name="author" required style={{ marginLeft: 8 }} />
-          </label>
-        </div>
-        <div style={{ marginBottom: 8 }}>
-          <label>
-            url
-            <input name="url" required style={{ marginLeft: 8 }} />
-          </label>
-        </div>
-        <button type="submit">create</button>
-      </form>
+    <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+      <h1 className="mb-6 text-3xl font-bold tracking-tight text-slate-900">
+        New Blog
+      </h1>
+      <NewBlogForm />
     </div>
   );
 }

@@ -1,6 +1,6 @@
-import { asc, desc, eq, sql } from "drizzle-orm";
+import { and, asc, desc, eq, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { blogs, type Blog } from "@/db/schema";
+import { blogs, readingList, type Blog } from "@/db/schema";
 
 export type { Blog };
 
@@ -19,7 +19,7 @@ export const getBlog = async (id: string): Promise<Blog | undefined> => {
 };
 
 export const createBlog = async (
-  blog: Omit<Blog, "id" | "likes">,
+  blog: Omit<Blog, "id" | "likes" | "userId"> & { userId?: number | null },
 ): Promise<Blog> => {
   const [newBlog] = await db
     .insert(blogs)
@@ -28,8 +28,17 @@ export const createBlog = async (
       author: blog.author,
       url: blog.url,
       likes: 0,
+      userId: blog.userId ?? null,
     })
     .returning();
+
+  if (blog.userId) {
+    await db.insert(readingList).values({
+      userId: blog.userId,
+      blogId: newBlog.id,
+      read: false,
+    });
+  }
 
   return newBlog;
 };
@@ -47,4 +56,41 @@ export const likeBlog = async (id: string): Promise<Blog | undefined> => {
     .returning();
 
   return updatedBlog;
+};
+
+export const isBlogInReadingList = async (
+  userId: number,
+  blogId: number,
+): Promise<boolean> => {
+  const [item] = await db
+    .select()
+    .from(readingList)
+    .where(
+      and(eq(readingList.userId, userId), eq(readingList.blogId, blogId)),
+    );
+
+  return Boolean(item);
+};
+
+export const addBlogToReadingList = async (userId: number, blogId: number) => {
+  const alreadyAdded = await isBlogInReadingList(userId, blogId);
+  if (alreadyAdded) {
+    return;
+  }
+
+  await db.insert(readingList).values({
+    userId,
+    blogId,
+    read: false,
+  });
+};
+
+export const getReadingListForUser = async (userId: number) => {
+  return db.query.readingList.findMany({
+    where: eq(readingList.userId, userId),
+    with: {
+      blog: true,
+    },
+    orderBy: [desc(readingList.id)],
+  });
 };
