@@ -1,8 +1,6 @@
 import Link from "next/link";
 import { getBlogs } from "@/lib/blogs";
 
-// Ensure the list is rendered on each request so newly created blogs
-// and updated likes appear in production as well as in development.
 export const dynamic = "force-dynamic";
 
 type BlogsPageProps = {
@@ -13,9 +11,9 @@ export default async function BlogsPage({ searchParams }: BlogsPageProps) {
   const { filter = "" } = await searchParams;
   const filterTerm = filter.trim().toLowerCase();
 
-  const blogs = getBlogs()
-    .filter((blog) => blog.title.toLowerCase().includes(filterTerm))
-    .sort((a, b) => b.likes - a.likes);
+  const blogs = (await getBlogs()).filter((blog) =>
+    blog.title.toLowerCase().includes(filterTerm),
+  );
 
   return (
     <div>

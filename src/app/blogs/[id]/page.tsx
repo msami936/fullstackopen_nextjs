@@ -10,7 +10,7 @@ type BlogPageProps = {
 
 export default async function BlogPage({ params }: BlogPageProps) {
   const { id } = await params;
-  const blog = getBlog(id);
+  const blog = await getBlog(id);
 
   if (!blog) {
     notFound();
